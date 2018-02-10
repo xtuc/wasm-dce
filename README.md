@@ -2,6 +2,21 @@
 
 > Drop unused functions in your WASM binary.
 
+## Example
+
+```diff
+(module
+-   (func $func_1 (param i32) (param i32) (result i32)
+-     (get_local 0)
+-     (get_local 1)
+-     (i32.add)
+-   )
+-   (export "add" (func $func_1))
++   (func)
+)
+
+```
+
 ## FAQ
 
 ### Why not use binaryen?

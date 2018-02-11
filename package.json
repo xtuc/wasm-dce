@@ -1,6 +1,6 @@
 {
   "name": "wasm-dce",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Eliminate unused functions in your WASM binary",
   "main": "index.js",
   "scripts": {

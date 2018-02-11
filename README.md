@@ -40,3 +40,4 @@ I encounter some issues (like removing the `func` wasn't working) and added an a
 - Support DCE for exported `global`, `memory`, `table`.
 - Remove elements only used by this function (other imports, data, etc).
 - Not remove the function if referenced by another function.
+- Add CLI for node projects or libs

@@ -1,14 +1,6 @@
 const {traverse, parsers, printers} = require("webassembly-interpreter/lib/tools");
 const libwabt = require('./libwabt');
 
-const emptyFunc = {
-  type: 'Func',
-  params: [],
-  result: [],
-  body: [],
-  name: null,
-};
-
 function debug(msg) {
   console.log(msg);
 }
@@ -21,8 +13,34 @@ function removeFuncAndExport(moduleExport, ast) {
 
   debug(`Remove unused "${exportName}"`);
 
+  // Count reference to the func first
+  let refCount = 0;
+
   traverse(ast, {
+
+    Identifier({node}) {
+      if (node.value === funcName) {
+        refCount++;
+      }
+    },
+  });
+
+  traverse(ast, {
+
     Func(path) {
+
+      // Can not remove this function, it's referenced elsewhere.
+      if (refCount > 1) {
+        return;
+      }
+
+      const emptyFunc = {
+        type: 'Func',
+        params: [],
+        result: [],
+        body: [],
+        name: null,
+      };
 
       if (path.node.name.value === funcName) {
         Object.assign(path.node, emptyFunc);
@@ -60,7 +78,13 @@ module.exports = function (buff, usedExports) {
     return usedModuleExports;
   }
 
-  const ast = parsers.parseWASM(buff);
+  let ast;
+
+  if (typeof buff === "string") {
+    ast = parsers.parseWATF(buff);
+  } else {
+    ast = parsers.parseWASM(buff);
+  }
 
   // Before
   // console.log(printers.printWAST(ast));
@@ -78,7 +102,7 @@ module.exports = function (buff, usedExports) {
   const {buffer} = m.toBinary({log: true, write_debug_names:true});
 
   // After
-  // console.log(printers.printWAST(ast));
+  // console.log(printers.printWAST(parsers.parseWASM(buffer)));
 
   return buffer;
 };

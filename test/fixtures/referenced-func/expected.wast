@@ -1,5 +1,5 @@
 (module 
-  (func $a (export "test") (param i32)
+  (func $func_2
     (nop)
   )
   (func $func_3

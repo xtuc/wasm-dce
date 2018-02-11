@@ -29,6 +29,11 @@ function removeFuncAndExport(moduleExport, ast) {
 
     Func(path) {
 
+      // Can not remove this function, it's referenced elsewhere.
+      if (refCount > 1) {
+        return;
+      }
+
       const emptyFunc = {
         type: 'Func',
         params: [],
@@ -97,7 +102,7 @@ module.exports = function (buff, usedExports) {
   const {buffer} = m.toBinary({log: true, write_debug_names:true});
 
   // After
-  // console.log(printers.printWAST(ast));
+  // console.log(printers.printWAST(parsers.parseWASM(buffer)));
 
   return buffer;
 };

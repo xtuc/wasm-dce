@@ -14,6 +14,7 @@ describe("Eliminate unused", () => {
     it(suite, () => {
       const wastModule = readFileSync(suite, "utf8");
 
+      // TODO(sven): configure this via staticly analysing a fake user code
       const usedExports = [];
 
       const actualBuff = loader(wastModule, usedExports);

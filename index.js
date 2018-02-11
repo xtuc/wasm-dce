@@ -41,24 +41,24 @@ function removeFuncAndExport(moduleExport, ast) {
   });
 }
 
-function getUnusedModuleExports(ast) {
-  const usedModuleExports = [];
-
-  traverse(ast, {
-
-    ModuleExport({node}) {
-      if (usedExports.indexOf(node.name) === -1) {
-        usedModuleExports.push(node);
-      }
-    },
-
-  });
-
-  return usedModuleExports;
-}
-
 
 module.exports = function (buff, usedExports, cb) {
+
+  function getUnusedModuleExports(ast) {
+    const usedModuleExports = [];
+
+    traverse(ast, {
+
+      ModuleExport({node}) {
+        if (usedExports.indexOf(node.name) === -1) {
+          usedModuleExports.push(node);
+        }
+      },
+
+    });
+
+    return usedModuleExports;
+  }
 
   parsers.parseWASM(buff, (ast) => {
     // Before

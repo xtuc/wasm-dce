@@ -1,9 +1,5 @@
 const {traverse, parsers, printers} = require("webassembly-interpreter/lib/tools");
-const {readFileSync} = require("fs");
 const libwabt = require('./libwabt');
-
-const usedExports = ["oo"];
-const filename = process.argv[2];
 
 const emptyFunc = {
   type: 'Func',
@@ -45,10 +41,6 @@ function removeFuncAndExport(moduleExport, ast) {
   });
 }
 
-function toArrayBuffer(buf) {
-  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-}
-
 function getUnusedModuleExports(ast) {
   const usedModuleExports = [];
 
@@ -65,26 +57,29 @@ function getUnusedModuleExports(ast) {
   return usedModuleExports;
 }
 
-const buff = toArrayBuffer(readFileSync(filename, null));
 
-parsers.parseWASM(buff, (ast) => {
-  // Before
-  // console.log(printers.printWAST(ast));
+module.exports = function (buff, usedExports, cb) {
 
-  getUnusedModuleExports(ast)
-    .forEach(e => removeFuncAndExport(e, ast));
+  parsers.parseWASM(buff, (ast) => {
+    // Before
+    // console.log(printers.printWAST(ast));
 
-  const wast = printers.printWAST(ast);
+    getUnusedModuleExports(ast)
+      .forEach(e => removeFuncAndExport(e, ast));
 
-  // To wasm
-  const m = libwabt.parseWat(filename, wast);
-  m.resolveNames();
-  m.validate();
+    const wast = printers.printWAST(ast);
 
-  const {buffer} = m.toBinary({log: true, write_debug_names:true});
+    // To wasm
+    const m = libwabt.parseWat('out.wast', wast);
+    m.resolveNames();
+    m.validate();
 
-  console.log(buffer);
+    const {buffer} = m.toBinary({log: true, write_debug_names:true});
 
-  // After
-  // console.log(printers.printWAST(ast));
-});
+    // After
+    // console.log(printers.printWAST(ast));
+
+    cb(buffer);
+  });
+
+};

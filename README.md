@@ -1,6 +1,11 @@
 # wasm-dce
 
-> Drop unused functions in your WASM binary.
+> Eliminate unused functions in your WASM binary.
+
+## Features
+
+- Removes the export instruction
+- Replaces the func with an empty one (to preserve the index)
 
 ## Example
 
@@ -23,6 +28,13 @@
 
 First you can see the JavaScript API is specified here https://github.com/WebAssembly/binaryen/wiki/binaryen.js-API.
 
-I tried but:
-- Function can't be removed (they are just renamed).
-- It has to reparse the WASM in its own format.
+I encounter some issues (like removing the `func` wasn't working) and added an additional parse of the WASM file.
+
+## Third party licenses
+
+- [js-webassembly-interpreter](https://github.com/xtuc/js-webassembly-interpreter) - GNU General Public License v2.0 see [LICENCE](https://github.com/xtuc/js-webassembly-interpreter/blob/master/LICENCE)
+
+## TODO
+
+- Add unit tests
+- Support DCE for exported `global`, `memory`, `table`.

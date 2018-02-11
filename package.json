@@ -1,7 +1,7 @@
 {
   "name": "wasm-dce",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Eliminate unused functions in your WASM binary",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,14 +10,13 @@
     "type": "git",
     "url": "git+https://github.com/xtuc/wasm-dce.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Sven Sauleau",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/xtuc/wasm-dce/issues"
   },
   "homepage": "https://github.com/xtuc/wasm-dce#readme",
   "dependencies": {
-    "@xtuc/binaryen": "^1.37.33",
     "webassembly-interpreter": "0.0.19"
   }
 }

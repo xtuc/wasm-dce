@@ -42,7 +42,7 @@ function removeFuncAndExport(moduleExport, ast) {
 }
 
 
-module.exports = function (buff, usedExports, cb) {
+module.exports = function (buff, usedExports) {
 
   function getUnusedModuleExports(ast) {
     const usedModuleExports = [];
@@ -60,26 +60,25 @@ module.exports = function (buff, usedExports, cb) {
     return usedModuleExports;
   }
 
-  parsers.parseWASM(buff, (ast) => {
-    // Before
-    // console.log(printers.printWAST(ast));
+  const ast = parsers.parseWASM(buff);
 
-    getUnusedModuleExports(ast)
-      .forEach(e => removeFuncAndExport(e, ast));
+  // Before
+  // console.log(printers.printWAST(ast));
 
-    const wast = printers.printWAST(ast);
+  getUnusedModuleExports(ast)
+    .forEach(e => removeFuncAndExport(e, ast));
 
-    // To wasm
-    const m = libwabt.parseWat('out.wast', wast);
-    m.resolveNames();
-    m.validate();
+  const wast = printers.printWAST(ast);
 
-    const {buffer} = m.toBinary({log: true, write_debug_names:true});
+  // To wasm
+  const m = libwabt.parseWat('out.wast', wast);
+  m.resolveNames();
+  m.validate();
 
-    // After
-    // console.log(printers.printWAST(ast));
+  const {buffer} = m.toBinary({log: true, write_debug_names:true});
 
-    cb(buffer);
-  });
+  // After
+  // console.log(printers.printWAST(ast));
 
+  return buffer;
 };

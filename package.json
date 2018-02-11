@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/xtuc/wasm-dce#readme",
   "dependencies": {
-    "webassembly-interpreter": "0.0.19"
+    "webassembly-interpreter": "0.0.20"
   }
 }

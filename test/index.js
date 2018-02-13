@@ -6,7 +6,7 @@ const {readFileSync, writeFileSync} = require("fs");
 const path = require("path");
 
 const loader = require("../src/index");
-const getUsedExports = require("../src/usedExports");
+const getUsedExports = require("../src/used-exports");
 
 describe("Eliminate unused", () => {
   const testSuites = glob.sync(

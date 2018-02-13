@@ -5,6 +5,7 @@
 ## Features
 
 - Removes the export instruction
+  - Removes its used resources
 - Replaces the func with an empty one (to preserve the index)
 
 ## Example

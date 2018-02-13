@@ -1,4 +1,5 @@
 const {parsers, printers} = require("webassembly-interpreter/lib/tools");
+const watfparsing = require("webassembly-interpreter/lib/compiler/parsing/watf/grammar");
 const chai = require("chai");
 const glob = require("glob");
 const {readFileSync, writeFileSync} = require("fs");
@@ -11,6 +12,11 @@ describe("Eliminate unused", () => {
   const testSuites = glob.sync(
     "test/fixtures/**/actual.wast"
   );
+
+  /**
+   * The watf parsing is stateful, we can reset its state manually for now
+   */
+  afterEach(() => watfparsing.resetUniqueNameGenerator());
 
   testSuites.forEach(suite => {
     it(suite, () => {

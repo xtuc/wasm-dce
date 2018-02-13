@@ -2,6 +2,10 @@ const {parse} = require("babylon");
 const traverse = require("@babel/traverse").default;
 const t = require("@babel/types");
 
+function identEq(l, r) {
+  return l.name === r.name;
+}
+
 function parseSource(source) {
   return parse(source, {
     sourceType: "module",
@@ -18,7 +22,7 @@ function parseSource(source) {
  * `import x from 'module.wasm'`
  *         ^
  */
-function onLocalModuleBinding(ident, ast) {
+function onLocalModuleBinding(ident, ast, acc) {
 
   traverse(ast, {
 
@@ -45,7 +49,7 @@ function onLocalModuleBinding(ident, ast) {
           return;
         }
 
-        onInstanceThenFn(thenFnBody);
+        onInstanceThenFn(thenFnBody, acc);
       }
     }
 
@@ -56,27 +60,68 @@ function onLocalModuleBinding(ident, ast) {
  * We found the function handling the module instance
  *
  * `makeX().then(...)`
- *               ^^^
- *
  */
-function onInstanceThenFn(fn) {
+function onInstanceThenFn(fn, acc) {
   if (t.isArrowFunctionExpression(fn) === false) {
     throw new Error("Unsupported function type: " + fn.type);
   }
 
-  const [localIdent] = fn.params;
+  let [localIdent] = fn.params;
+
+  /**
+   * `then(({exports}) => ...)`
+   *
+   * We need to resolve the identifier (binding) from the ObjectPattern.
+   *
+   * TODO(sven): handle renaming the binding here
+   */
+  if (t.isObjectPattern(localIdent) === true) {
+    // ModuleInstance has the exports prop by spec
+    localIdent = t.identifier('exports');
+  }
 
   traverse(fn.body, {
     noScope: true,
 
-    Identifier({node}) {
-      console.log(node);
+    MemberExpression(path) {
+      const {object, property} = path.node;
+
+      /**
+       * Search for `localIdent.exports`
+       */
+      if (
+        identEq(object, localIdent) === true
+        && t.isIdentifier(property, {name: 'exports'})
+      ) {
+        /**
+         * We are looking for the right branch of the parent MemberExpression:
+         * `(localIdent.exports).x`
+         *                       ^
+         */
+        let {property} = path.parentPath.node;
+
+        // Found an usage of an export
+        acc.push(property.name);
+
+        path.stop();
+      }
+
+      /**
+       * `exports` might be a local binding (from destructuring)
+       */
+      else if (identEq(object, localIdent) === true) {
+        // Found an usage of an export
+        acc.push(property.name);
+
+        path.stop();
+      }
     }
 
   });
 }
 
 module.exports = function (source) {
+  const usedExports = []
   const ast = parseSource(source);
 
   traverse(ast, {
@@ -85,13 +130,12 @@ module.exports = function (source) {
       const [specifier] = path.node.specifiers;
 
       if (t.isImportDefaultSpecifier(specifier)) {
-        onLocalModuleBinding(specifier.local, ast);
+        onLocalModuleBinding(specifier.local, ast, usedExports);
         path.stop();
       }
 
     }
-
   });
 
-  return [];
+  return usedExports;
 };

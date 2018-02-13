@@ -1,6 +1,6 @@
 (module 
-  (func $func_4 (param i32)
+  (func $func_5 (param i32)
     (nop)
   )
-  (export "foobar" (func $func_4))
+  (export "foobar" (func $func_5))
 )

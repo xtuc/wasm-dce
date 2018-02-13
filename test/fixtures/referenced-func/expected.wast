@@ -1,8 +1,9 @@
 (module 
-  (func $func_2
+  (func $func_3
     (nop)
   )
-  (func $func_3
+  (func $func_4
     (call 0)
   )
+  (export "test" (func $func_3))
 )

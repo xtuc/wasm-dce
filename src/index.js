@@ -1,81 +1,40 @@
 const {traverse, parsers, printers} = require("webassembly-interpreter/lib/tools");
+
 const libwabt = require('./libwabt');
-
-function debug(msg) {
-  console.log(msg);
-}
-
-function removeFuncAndExport(moduleExport, ast) {
-  const exportName = moduleExport.name;
-
-  // TODO(sven): test if we actually want to delete a func
-  const funcName = moduleExport.descr.id.value;
-
-  debug(`Remove unused "${exportName}"`);
-
-  // Count reference to the func first
-  let refCount = 0;
-
-  traverse(ast, {
-
-    Identifier({node}) {
-      if (node.value === funcName) {
-        refCount++;
-      }
-    },
-  });
-
-  traverse(ast, {
-
-    Func(path) {
-
-      // Can not remove this function, it's referenced elsewhere.
-      if (refCount > 1) {
-        return;
-      }
-
-      const emptyFunc = {
-        type: 'Func',
-        params: [],
-        result: [],
-        body: [],
-        name: null,
-      };
-
-      if (path.node.name.value === funcName) {
-        Object.assign(path.node, emptyFunc);
-        debug('\t> remove func');
-      }
-    },
-
-    ModuleExport(path) {
-      if (path.node.name === exportName) {
-        // FIXME(sven): here's a hack to hide the node, since this type is not
-        // printable
-        path.node.type = 'deleted';
-        debug('\t> remove export');
-      }
-    },
-  });
-}
-
+const removeFunc = require('./removal');
+const countRefByName = require('./reference-couting');
 
 module.exports = function (buff, usedExports) {
 
-  function getUnusedModuleExports(ast) {
-    const usedModuleExports = [];
+  function isUnused(moduleExport) {
+    return usedExports.indexOf(moduleExport.name) === -1;
+  }
+
+  function canRemove(moduleExport) {
+    const funcName = moduleExport.descr.id.value;
+
+    // Check if it's not referenced elsewhere.
+    const refCount = countRefByName(ast, funcName);
+
+    if (refCount > 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  function getModuleExports(ast) {
+    const moduleExports = [];
 
     traverse(ast, {
 
       ModuleExport({node}) {
-        if (usedExports.indexOf(node.name) === -1) {
-          usedModuleExports.push(node);
-        }
+        moduleExports.push(node);
       },
 
     });
 
-    return usedModuleExports;
+    return moduleExports;
   }
 
   let ast;
@@ -89,8 +48,10 @@ module.exports = function (buff, usedExports) {
   // Before
   // console.log(printers.printWAST(ast));
 
-  getUnusedModuleExports(ast)
-    .forEach(e => removeFuncAndExport(e, ast));
+  getModuleExports(ast)
+    .filter(isUnused)
+    .filter(canRemove)
+    .forEach(e => removeFunc(e, ast));
 
   const wast = printers.printWAST(ast);
 

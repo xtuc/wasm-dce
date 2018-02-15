@@ -11,7 +11,7 @@
 - Unused exported func:
   - `Remove(ModuleExport)`
   - `Remove(Func)`
-    - Collect Identifiers in its body
+    - Collect Identifiers in its body (not implemented)
         - For CallInstruction
           - For each if `CountReference(Identifier) < 2` and not exported
             - If Import

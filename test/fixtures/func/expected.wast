@@ -1,3 +1,3 @@
 (module 
-  (func $func_2)
+  (func $func_1)
 )

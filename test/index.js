@@ -1,9 +1,11 @@
 const {parsers, printers} = require("webassembly-interpreter/lib/tools");
-const loader = require("../index");
 const chai = require("chai");
 const glob = require("glob");
 const {readFileSync, writeFileSync} = require("fs");
 const path = require("path");
+
+const loader = require("../src/index");
+const getUsedExports = require("../src/used-exports");
 
 describe("Eliminate unused", () => {
   const testSuites = glob.sync(
@@ -14,13 +16,13 @@ describe("Eliminate unused", () => {
     it(suite, () => {
       const wastModule = readFileSync(suite, "utf8");
 
-      // TODO(sven): configure this via staticly analysing a fake user code
-      const usedExports = [];
+      const userFile = path.join(path.dirname(suite), "user.js");
+      const expectedFile = path.join(path.dirname(suite), "expected.wast");
+
+      const usedExports = getUsedExports(readFileSync(userFile, "utf8"));
 
       const actualBuff = loader(wastModule, usedExports);
       const actualWast = printers.printWAST(parsers.parseWASM(actualBuff));
-
-      const expectedFile = path.join(path.dirname(suite), "expected.wast");
 
       let expected;
       try {

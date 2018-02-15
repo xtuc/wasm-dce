@@ -1,9 +1,8 @@
 (module
-  (func $a (export "test")
+  (func $referenceda (export "test")
     (nop)
   )
-
   (func
-    (call $a)
+    (call $referenceda)
   )
 )

@@ -2,7 +2,7 @@
   "name": "wasm-dce",
   "version": "0.0.4",
   "description": "Eliminate unused functions in your WASM binary",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha"
   },
@@ -17,7 +17,11 @@
   },
   "homepage": "https://github.com/xtuc/wasm-dce#readme",
   "dependencies": {
-    "webassembly-interpreter": "0.0.23"
+    "@babel/core": "^7.0.0-beta.39",
+    "@babel/traverse": "^7.0.0-beta.39",
+    "@babel/types": "^7.0.0-beta.39",
+    "babylon": "^7.0.0-beta.39",
+    "webassembly-interpreter": "0.0.25"
   },
   "devDependencies": {
     "chai": "^4.1.2",

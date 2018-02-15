@@ -21,5 +21,3 @@
         - For Instructions `get_global` and `set_global`
           - For each if `CountReference(Identifier) < 2` and not exported
             - `Remove(Global)`
-- Unused exported global:
-  - ``

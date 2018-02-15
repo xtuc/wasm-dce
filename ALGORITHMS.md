@@ -16,8 +16,8 @@
           - For each if `CountReference(Identifier) < 2` and not exported
             - If Import
               - `Remove(Import)`
-            - If Func (not implemented)
+            - If Func
               - `Remove(Func)`
-        - For Instructions `get_global` and `set_global` (not implemented)
+        - For Instructions `get_global` and `set_global`
           - For each if `CountReference(Identifier) < 2` and not exported
             - `Remove(Global)`

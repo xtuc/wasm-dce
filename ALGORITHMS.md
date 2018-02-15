@@ -11,13 +11,13 @@
 - Unused exported func:
   - `Remove(ModuleExport)`
   - `Remove(Func)`
-    - Collect Identifiers in its body (not implemented)
+    - Collect Identifiers in its body
         - For CallInstruction
           - For each if `CountReference(Identifier) < 2` and not exported
             - If Import
               - `Remove(Import)`
-            - If Func
+            - If Func (not implemented)
               - `Remove(Func)`
-        - For Instructions `get_global` and `set_global`
+        - For Instructions `get_global` and `set_global` (not implemented)
           - For each if `CountReference(Identifier) < 2` and not exported
             - `Remove(Global)`

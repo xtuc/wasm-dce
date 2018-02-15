@@ -121,21 +121,29 @@ function onInstanceThenFn(fn, acc) {
 }
 
 module.exports = function (source) {
-  const usedExports = []
+  const usedExportsByModuleName = {};
   const ast = parseSource(source);
 
   traverse(ast, {
 
     ImportDeclaration(path) {
+      const sourceValue = path.node.source.value;
       const [specifier] = path.node.specifiers;
 
+      usedExportsByModuleName[sourceValue] = [];
+
       if (t.isImportDefaultSpecifier(specifier)) {
-        onLocalModuleBinding(specifier.local, ast, usedExports);
+        onLocalModuleBinding(
+          specifier.local,
+          ast,
+          usedExportsByModuleName[sourceValue]
+        );
+
         path.stop();
       }
-
     }
+
   });
 
-  return usedExports;
+  return usedExportsByModuleName;
 };

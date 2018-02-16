@@ -35,6 +35,6 @@ jsFiles.forEach((file) => {
     const newBuff = wasmdce(buff, usedExports[wasmFilename]);
 
     // Emit new binary
-    writeFileSync(fqfilename, new Buffer(newBuff));
+    writeFileSync(fqfilename + '.new', new Buffer(newBuff));
   });
 });

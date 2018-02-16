@@ -1,7 +1,7 @@
 const {traverse, parsers, printers} = require("webassembly-interpreter/lib/tools");
 
 const libwabt = require('./libwabt');
-const removeFunc = require('./removal');
+const {removeFuncByName, removeExportByName} = require('./removal');
 const countRefByName = require('./reference-couting');
 
 module.exports = function (buff, usedExports) {
@@ -11,6 +11,13 @@ module.exports = function (buff, usedExports) {
   }
 
   function canRemove(moduleExport) {
+    if (moduleExport.descr.type !== "Func") {
+      // TODO(sven): currently only handles exported functions
+
+      console.warn('Unsupported removal of type: ' + moduleExport.descr.type)
+      return false;
+    }
+
     const funcName = moduleExport.descr.id.value;
 
     // Check if it's not referenced elsewhere.
@@ -51,7 +58,15 @@ module.exports = function (buff, usedExports) {
   getModuleExports(ast)
     .filter(isUnused)
     .filter(canRemove)
-    .forEach(e => removeFunc(e, ast));
+    .forEach(moduleExport => {
+      const exportName = moduleExport.name;
+      const funcName = moduleExport.descr.id.value;
+
+      console.log(`Remove unused "${exportName}"`);
+
+      removeFuncByName(funcName, ast);
+      removeExportByName(exportName, ast);
+    });
 
   const wast = printers.printWAST(ast);
 

@@ -17,7 +17,7 @@ module.exports = function removeFunc(moduleExport, ast) {
   // TODO(sven): test if we actually want to delete a func
   const funcName = moduleExport.descr.id.value;
 
-  console.log(`Remove unused "${exportName}"`);
+  // console.log(`Remove unused "${exportName}"`);
 
   traverse(ast, {
 
@@ -25,7 +25,7 @@ module.exports = function removeFunc(moduleExport, ast) {
 
       if (path.node.name.value === funcName) {
         replaceWithEmptyFunc(path.node);
-        console.log('\t> remove func');
+        // console.log('\t> remove func');
       }
     },
 
@@ -34,7 +34,7 @@ module.exports = function removeFunc(moduleExport, ast) {
         // FIXME(sven): here's a hack to hide the node, since this type is not
         // printable
         path.node.type = 'deleted';
-        console.log('\t> remove export');
+        // console.log('\t> remove export');
       }
     },
   });

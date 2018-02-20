@@ -51,12 +51,12 @@ function removeFuncByName(funcName, ast) {
           const refs = countRefByName(name);
 
           if (refs < 2) {
-            console.log('\t\t> remove child func ' + name + ' (found ' + refs + ' refs)');
+            // console.log('\t\t> remove child func ' + name + ' (found ' + refs + ' refs)');
             removeFuncByName(name, ast);
           }
         });
 
-        console.log('\t> remove func ' + funcName);
+        // console.log('\t> remove func ' + funcName);
       }
     }
 
@@ -71,7 +71,7 @@ function removeExportByName(name, ast) {
         // FIXME(sven): here's a hack to hide the node, since this type is not
         // printable
         path.node.type = 'deleted';
-        console.log('\t> remove export');
+        // console.log('\t> remove export');
       }
     }
   });

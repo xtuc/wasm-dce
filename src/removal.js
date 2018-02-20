@@ -46,6 +46,11 @@ function removeFuncByName(funcName, ast) {
         calls.forEach(call => {
           const calledFn = funcIndex.getByIndex(call);
 
+          // Func has no name, we can't remove it so skip it
+          if (calledFn.name == null) {
+            return;
+          }
+
           // if (typeof calledFn 
           const name = calledFn.name.value;
           const refs = countRefByName(name);

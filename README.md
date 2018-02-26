@@ -1,3 +1,7 @@
+# This repo has been moved
+
+See https://github.com/xtuc/js-webassembly-interpreter/tree/master/packages/dce.
+
 # wasm-dce
 
 > Eliminate unused functions in your WASM binary.

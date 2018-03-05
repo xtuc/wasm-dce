@@ -19,7 +19,11 @@ describe("Eliminate unused", () => {
       const userFile = path.join(path.dirname(suite), "user.js");
       const expectedFile = path.join(path.dirname(suite), "expected.wast");
 
-      const usedExports = getUsedExports(readFileSync(userFile, "utf8"));
+      const usedExportsByModuleName = getUsedExports(readFileSync(userFile, "utf8"));
+
+      // Just take the first module we found (since it's just the tests)
+      const usedExportsByModuleNameKeys = Object.keys(usedExportsByModuleName);
+      const usedExports = usedExportsByModuleName[usedExportsByModuleNameKeys[0]] || [];
 
       const actualBuff = loader(wastModule, usedExports);
       const actualWast = printers.printWAST(parsers.parseWASM(actualBuff));
